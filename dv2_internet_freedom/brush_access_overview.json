@@ -1,0 +1,75 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "data": {"url": "internet_access_long.csv"},
+  "params": [
+    {
+      "name": "countryPick",
+      "value": "Australia",
+      "bind": {
+        "input": "select",
+        "name": "Country: ",
+        "options": ["Australia","Brazil","China","India","Japan","Saudi Arabia", "United Kingdom","United States"]
+      }
+    }
+  ],
+  "vconcat": [
+    {
+      "width": 900,
+      "height": 300,
+      "transform": [
+        {"calculate": "toNumber(datum.year)", "as": "yr"},
+        {"calculate": "toNumber(datum.users_pct)", "as": "val"},
+        {"filter": "datum.country == countryPick"}
+      ],
+      "mark": {"type": "line", "point": true},
+      "encoding": {
+        "x": {
+          "field": "yr",
+          "type": "quantitative",
+          "title": "Year",
+          "scale": {"domain": {"param": "brush"}},
+          "axis": {"format": "d", "tickMinStep": 1}
+        },
+        "y": {
+          "field": "val",
+          "type": "quantitative",
+          "title": "% of population online"
+        },
+        "tooltip": [
+          {"field": "country", "title": "Country"},
+          {"field": "yr", "title": "Year", "type": "quantitative"},
+          {"field": "val", "title": "% Online", "type": "quantitative", "format": ".1f"}
+        ],
+        "color": {"value": "#1f77b4"}
+      }
+    },
+    {
+      "width": 900,
+      "height": 70,
+      "transform": [
+        {"calculate": "toNumber(datum.year)", "as": "yr"},
+        {"calculate": "toNumber(datum.users_pct)", "as": "val"},
+        {"filter": "datum.country == countryPick"}
+      ],
+      "mark": "area",
+      "params": [
+        {"name": "brush", "select": {"type": "interval", "encodings": ["x"]}}
+      ],
+      "encoding": {
+        "x": {
+          "field": "yr",
+          "type": "quantitative",
+          "title": "",
+          "axis": {"format": "d", "tickMinStep": 1}
+        },
+        "y": {
+          "aggregate": "mean",
+          "field": "val",
+          "type": "quantitative",
+          "axis": {"tickCount": 3, "grid": false},
+          "title": ""
+        }
+      }
+    }
+  ]
+}

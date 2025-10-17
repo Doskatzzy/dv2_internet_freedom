@@ -1,0 +1,76 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "width": 800,
+  "height": 460,
+  "data": {"url": "internet_access_long.csv"},
+  "transform": [
+    {"calculate": "toNumber(datum.year)", "as": "yr"},
+    {"calculate": "toNumber(datum.users_pct)", "as": "val"},
+    {
+      "filter": {
+        "field": "country",
+        "oneOf": [
+          "United Arab Emirates",
+          "Bahrain",
+          "Saudi Arabia",
+          "Iceland",
+          "Kuwait",
+          "Qatar",
+          "Luxembourg",
+          "Monaco",
+          "Brunei Darussalam",
+          "Norway"
+        ]
+      }
+    },
+    {"filter": "isValid(datum.yr) && isValid(datum.val) && datum.yr >= 1990 && datum.yr <= 2023"}
+  ],
+  "layer": [
+    {
+      "mark": {"type": "line", "point": true},
+      "encoding": {
+        "x": {
+          "field": "yr", "type": "quantitative",
+          "title": "Year", "axis": {"format": "d"}
+        },
+        "y": {
+          "field": "val", "type": "quantitative",
+          "title": "% of population online",
+          "scale": {"domain": [0, 100]}
+        },
+        "color": {"field": "country", "type": "nominal", "legend": {"title": "Country"}},
+        "order": {"field": "yr"},
+        "tooltip": [
+          {"field": "country", "title": "Country"},
+          {"field": "yr", "title": "Year", "format": "d"},
+          {"field": "val", "title": "% Online", "format": ".1f"}
+        ]
+      }
+    },
+    {
+      "transform": [
+        {
+          "window": [{"op": "row_number", "as": "rn"}],
+          "sort": [{"field": "yr", "order": "descending"}],
+          "groupby": ["country"]
+        },
+        {"filter": "datum.rn == 1"}
+      ],
+      "mark": {
+        "type": "text",
+        "dx": 6,
+        "dy": -6,
+        "fontWeight": "bold",
+        "stroke": "white",
+        "strokeWidth": 3,
+        "strokeJoin": "round"
+      },
+      "encoding": {
+        "x": {"field": "yr", "type": "quantitative"},
+        "y": {"field": "val", "type": "quantitative"},
+        "text": {"field": "country"},
+        "color": {"field": "country", "type": "nominal"}
+      }
+    }
+  ]
+}

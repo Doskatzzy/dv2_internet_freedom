@@ -1,0 +1,91 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "width": 900,
+  "height": 520,
+  "projection": {"type": "equalEarth"},
+  "layer": [
+    {
+      "data": {
+        "url": "ne_110m_admin_0_countries.json",
+        "format": {"type": "topojson", "feature": "ne_110m_admin_0_countries"}
+      },
+      "mark": {"type": "geoshape", "fill": "#f0f2f5", "stroke": "#d0d0d0", "strokeWidth": 0.5}
+    },
+
+    {
+      "data": {"url": "internet_access_long.csv"},
+      "transform": [
+        {"calculate": "toNumber(datum.year)", "as": "yr"},
+        {"calculate": "toNumber(datum.users_pct)", "as": "val"},
+        {"filter": "isValid(datum.val)"},
+        {"filter": "datum.val >= 50"},
+        {"aggregate": [{"op": "min", "field": "yr", "as": "reach50"}], "groupby": ["iso3","country"]},
+        {
+          "lookup": "iso3",
+          "from": {
+            "data": {
+              "url": "ne_110m_admin_0_countries.json",
+              "format": {"type": "topojson", "feature": "ne_110m_admin_0_countries"}
+            },
+            "key": "properties.ADM0_A3"
+          },
+          "as": "geo"
+        },
+        {"filter": "datum.geo != null"}
+      ],
+      "mark": {"type": "geoshape", "stroke": "#d0d0d0", "strokeWidth": 0.5},
+      "encoding": {
+        "shape": {"field": "geo", "type": "geojson"},
+        "color": {
+          "field": "reach50",
+          "type": "quantitative",
+          "title": "Year reached >=0%",
+          "scale": {"scheme": "tealblues"},
+          "legend": {"format": "d"}
+        },
+        "tooltip": [
+          {"field": "country", "title": "Country"},
+          {"field": "reach50", "title": "Year >=50%"}
+        ]
+      }
+    },
+
+    {
+      "data": {"url": "internet_access_long.csv"},
+      "transform": [
+        {"calculate": "toNumber(datum.year)", "as": "yr"},
+        {"calculate": "toNumber(datum.users_pct)", "as": "val"},
+        {"filter": "isValid(datum.val)"},
+        {"joinaggregate": [{"op": "max", "field": "val", "as": "peakVal"}], "groupby": ["iso3","country"]},
+        {"filter": "datum.peakVal < 50"},
+        {
+          "lookup": "iso3",
+          "from": {
+            "data": {
+              "url": "ne_110m_admin_0_countries.json",
+              "format": {"type": "topojson", "feature": "ne_110m_admin_0_countries"}
+            },
+            "key": "properties.ADM0_A3"
+          },
+          "as": "geo"
+        },
+        {"filter": "datum.geo != null"},
+        {"calculate": "'Not yet ≥50%'", "as": "status"}
+      ],
+      "mark": {"type": "geoshape", "stroke": "#d0d0d0", "strokeWidth": 0.5},
+      "encoding": {
+        "shape": {"field": "geo", "type": "geojson"},
+        "color": {
+          "field": "status",
+          "type": "nominal",
+          "scale": {"domain": ["Not yet ≥50%"], "range": ["#f39c12"]},
+          "legend": {"title": "Status"}
+        },
+        "tooltip": [
+          {"field": "country", "title": "Country"},
+          {"field": "status", "title": ""}
+        ]
+      }
+    }
+  ]
+}

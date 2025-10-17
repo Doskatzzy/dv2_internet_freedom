@@ -1,0 +1,111 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "title": "Access (2023) vs Freedom (2024) - Dumbbell (Top 30 by Access)",
+  "width": 800,
+  "height": {"step": 18},
+  "data": {"url": "internet_access_long.csv"},
+  "params": [
+    {
+      "name": "statusPick",
+      "value": "All",
+      "bind": {
+        "input": "select",
+        "name": "Filter by status: ",
+        "options": ["All","F","PF","NF"]
+      }
+    }
+  ],
+  "transform": [
+    {"calculate": "toNumber(datum.year)", "as": "yr"},
+    {"calculate": "toNumber(datum.users_pct)", "as": "access"},
+    {"filter": "datum.yr == 2023 && isValid(datum.access)"},
+    {
+      "lookup": "country",
+      "from": {
+        "data": {"url": "freedom_net.csv"},
+        "key": "country",
+        "fields": ["freedom_score","freedom_status","year"]
+      }
+    },
+    {"calculate": "toNumber(datum.freedom_score)", "as": "freedom"},
+    {"filter": "isValid(datum.freedom)"},
+    {"window": [{"op": "rank", "as": "rk"}], "sort": [{"field": "access", "order": "descending"}]},
+    {"filter": "datum.rk <= 30"},
+    {"filter": "statusPick == 'All' || datum.freedom_status == statusPick"},
+    {"calculate": "min(datum.access, datum.freedom)", "as": "x1"},
+    {"calculate": "max(datum.access, datum.freedom)", "as": "x2"}
+  ],
+  "layer": [
+    {
+      "mark": {"type": "rule", "strokeDash": [4,4], "color": "#888"},
+      "encoding": {"x": {"value": 60}}
+    },
+    {
+      "mark": {"type": "rule", "stroke": "#bbbbbb"},
+      "encoding": {
+        "y": {"field": "country", "type": "nominal", "title": null,
+              "sort": {"field": "access", "order": "descending"}},
+        "x": {"field": "x1", "type": "quantitative",
+              "scale": {"domain": [0,100]},
+              "axis": {"title": "Value (0–100)", "format": "d"}},
+        "x2": {"field": "x2"}
+      }
+    },
+    {
+      "mark": {"type": "point", "filled": true, "size": 70, "color": "#3182bd"},
+      "encoding": {
+        "y": {"field": "country", "type": "nominal",
+              "sort": {"field": "access", "order": "descending"}},
+        "x": {"field": "access", "type": "quantitative"},
+        "tooltip": [
+          {"field": "country"},
+          {"field": "access", "title": "% Online (2023)", "type": "quantitative", "format": ".1f"},
+          {"field": "freedom", "title": "Freedom (2024)", "type": "quantitative", "format": ".0f"},
+          {"field": "freedom_status", "title": "Status"}
+        ]
+      }
+    },
+    {
+      "mark": {"type": "point", "filled": true, "size": 70, "shape": "square"},
+      "encoding": {
+        "y": {"field": "country", "type": "nominal",
+              "sort": {"field": "access", "order": "descending"}},
+        "x": {"field": "freedom", "type": "quantitative"},
+        "color": {
+          "field": "freedom_status",
+          "type": "nominal",
+          "title": "Freedom Status",
+          "scale": {"domain": ["F","PF","NF"], "range": ["#08306b", "#6baed6", "#deebf7"]}
+        },
+        "tooltip": [
+          {"field": "country"},
+          {"field": "access", "title": "% Online (2023)", "type": "quantitative", "format": ".1f"},
+          {"field": "freedom", "title": "Freedom (2024)", "type": "quantitative", "format": ".0f"},
+          {"field": "freedom_status", "title": "Status"}
+        ]
+      }
+    },
+    {
+      "transform": [{"filter": "datum.country == 'Belarus'"}],
+      "mark": {
+        "type": "text",
+        "align": "left",
+        "dx": 6,
+        "baseline": "middle",
+        "fontSize": 12,
+        "fontWeight": "bold",
+        "color": "#333"
+      },
+      "encoding": {
+        "y": {"field": "country", "type": "nominal",
+              "sort": {"field": "access", "order": "descending"}},
+        "x": {"field": "freedom", "type": "quantitative"},
+        "text": {"value": "Belarus - Freedom 22 and Access 91.5%. This is due to State-controlled internet"}
+      }
+    }
+  ],
+  "config": {
+    "axis": {"labelFontSize": 10, "titleFontSize": 12},
+    "legend": {"titleFontSize": 12, "labelFontSize": 11}
+  }
+}
