@@ -1,0 +1,89 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "Access vs Freedom",
+  "width": 800,
+  "height": 520,
+  "padding": {"top": 10, "right": 20, "bottom": 40, "left": 60},
+  "data": {"url": "internet_access_long.csv"},
+  "transform": [
+    {"window":[{"op":"rank","as":"r"}],
+     "sort":[{"field":"year","order":"descending"}],
+     "groupby":["country"]},
+    {"filter":"datum.r == 1"},
+    {"lookup":"country",
+     "from":{"data":{"url":"freedom_net.csv"},
+             "key":"country",
+             "fields":["freedom_score","freedom_status","year"]}},
+    {"filter":"isValid(datum.freedom_score)"},
+    {"calculate":"toNumber(datum.users_pct)","as":"usersNum"},
+    {"calculate":"toNumber(datum.freedom_score)","as":"freeNum"}
+  ],
+  "layer": [
+    {"mark":{"type":"rule","strokeDash":[4,4]},
+     "encoding":{"x":{"datum":60}}},
+    {"mark":{"type":"rule","strokeDash":[4,4]},
+     "encoding":{"y":{"datum":70}}},
+    {
+      "mark":{"type":"circle","opacity":0.85},
+      "encoding":{
+        "x":{
+          "field":"usersNum","type":"quantitative",
+          "title":"% of population online",
+          "scale":{"domain":[0,110], "nice": false}
+        },
+        "y":{
+          "field":"freeNum","type":"quantitative",
+          "title":"Freedom on the Net (0-100)",
+          "scale":{"domain":[0,100]}
+        },
+        "size":{
+          "field":"usersNum","type":"quantitative",
+          "title":"Point size: % online",
+          "scale":{"range":[40,900]},
+          "legend":{"orient":"left"}
+        },
+        "color":{
+          "field":"freedom_status","type":"nominal","title":"Freedom Status",
+          "scale":{"domain":["F","PF","NF"],"range":["#1f77b4","#7fb3d5","#d6eaf8"]},
+          "legend":{"orient":"left","offset":20}
+        },
+        "tooltip":[
+          {"field":"country","title":"Country"},
+          {"field":"usersNum","title":"% Online","type":"quantitative","format":".1f"},
+          {"field":"freeNum","title":"Freedom Score","type":"quantitative","format":".0f"},
+          {"field":"freedom_status","title":"Status"},
+          {"field":"year","title":"Freedom year"}
+        ]
+      }
+    },
+    {
+      "transform":[
+        {"filter":"datum.country == 'Iceland'"},
+        {"calculate":"datum.usersNum + 5","as":"x2"},
+        {"calculate":"datum.freeNum + 6","as":"y2"}
+      ],
+      "mark":{"type":"rule","color":"#555","strokeDash":[2,2]},
+      "encoding":{
+        "x":{"field":"usersNum","type":"quantitative"},
+        "y":{"field":"freeNum","type":"quantitative"},
+        "x2":{"field":"x2"},
+        "y2":{"field":"y2"}
+      }
+    },
+    {
+      "transform":[
+        {"filter":"datum.country == 'Iceland'"},
+        {"calculate":"'Iceland - 94% online and 94/100 freedom (2024) score. This is largely thanks to the fact that censorship is prohibited by the Icelandic Constitution'","as":"label"}
+      ],
+      "mark":{
+        "type":"text","align":"right","dx": -15,"dy": 5
+      },
+      "encoding":{
+        "x":{"field":"usersNum","type":"quantitative"},
+        "y":{"field":"freeNum","type":"quantitative"},
+        "text":{"field":"label"}
+      }
+    }
+  ],
+  "config":{"mark":{"invalid": null}}
+}

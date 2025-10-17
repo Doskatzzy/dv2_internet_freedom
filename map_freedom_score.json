@@ -1,0 +1,55 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "width": 850,
+  "height": 520,
+  "params": [
+    {"name": "zoom", "value": 160, "bind": {"input": "range", "name": "Zoom: ", "min": 80, "max": 900, "step": 1}},
+    {"name": "lon", "value": 0, "bind": {"input": "range", "name": "Lon: ", "min": -180, "max": 180, "step": 1}},
+    {"name": "lat", "value": 0, "bind": {"input": "range", "name": "Lat: ", "min": -60, "max": 85, "step": 1}}
+  ],
+  "projection": {"type": "equalEarth", "center": {"expr": "[lon, lat]"}, "scale": {"expr": "zoom"}},
+  "data": {"url": "freedom_net.csv"},
+  "transform": [
+    {"calculate": "toNumber(datum.year)", "as": "yr"},
+    {"filter": "datum.yr == 2024"},
+    {
+      "lookup": "country",
+      "from": {
+        "data": {
+          "url": "ne_110m_admin_0_countries.json",
+          "format": {"type": "topojson", "feature": "ne_110m_admin_0_countries"}
+        },
+        "key": "properties.NAME"
+      },
+      "as": "geo"
+    }
+  ],
+  "layer": [
+    {
+      "data": {
+        "url": "ne_110m_admin_0_countries.json",
+        "format": {"type": "topojson", "feature": "ne_110m_admin_0_countries"}
+      },
+      "mark": {"type": "geoshape", "fill": "#f0f2f5", "stroke": "#d0d0d0", "strokeWidth": 0.5}
+    },
+    {
+      "transform": [{"filter": "isValid(datum.freedom_score) || isValid(datum.freedom_status)"}],
+      "mark": {"type": "geoshape", "stroke": "#d0d0d0", "strokeWidth": 0.5},
+      "encoding": {
+        "shape": {"field": "geo", "type": "geojson"},
+        "color": {
+          "field": "freedom_score",
+          "type": "quantitative",
+          "title": "Freedom on the Net (0-100)",
+          "scale": {"scheme": "blues"}
+        },
+        "tooltip": [
+          {"field": "country", "title": "Country"},
+          {"field": "freedom_score", "title": "Score"},
+          {"field": "freedom_status", "title": "Status"},
+          {"field": "yr", "title": "Year"}
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,59 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "title": "Change in Internet Access (2000 → 2023)",
+  "width": 850,
+  "height": {"step": 16},
+  "data": {"url": "internet_access_long.csv"},
+  "transform": [
+    {"calculate": "toNumber(datum.year)", "as": "yr"},
+    {"calculate": "toNumber(datum.users_pct)", "as": "val"},
+    {"filter": "datum.yr == 2000 || datum.yr == 2023"},
+    {"aggregate": [{"op": "max", "field": "val", "as": "val"}], "groupby": ["country","yr"]},
+    {"pivot": "yr", "value": "val", "groupby": ["country"]},
+    {"filter": "isValid(datum['2000']) && isValid(datum['2023'])"},
+    {"calculate": "datum['2023'] - datum['2000']", "as": "delta"},
+    {
+      "lookup": "country",
+      "from": {
+        "data": {"url": "freedom_net.csv"},
+        "key": "country",
+        "fields": ["freedom_status"]
+      }
+    },
+    {"filter": "isValid(datum.freedom_status)"},
+    {"window": [{"op": "rank", "as": "rk"}], "sort": [{"field": "delta", "order": "descending"}]},
+    {"filter": "datum.rk <= 25"},
+    {"fold": ["2000","2023"], "as": ["year","value"]}
+  ],
+  "layer": [
+    {
+      "mark": {"type": "rule", "stroke": "#bbbbbb"},
+      "encoding": {
+        "y": {"field": "country", "type": "nominal", "sort": {"field": "delta", "order": "descending"}, "title": null},
+        "x": {"field": "2000", "type": "quantitative", "title": "% online"},
+        "x2": {"field": "2023"}
+      }
+    },
+    {
+      "mark": {"type": "point", "filled": true, "size": 55},
+      "encoding": {
+        "y": {"field": "country", "type": "nominal", "sort": {"field": "delta", "order": "descending"}},
+        "x": {"field": "value", "type": "quantitative", "title": "(2000 vs 2023)"},
+        "shape": {"field": "year", "type": "nominal", "scale": {"domain": ["2000","2023"], "range": ["triangle-left","circle"]}},
+        "color": {
+          "field": "freedom_status",
+          "type": "nominal",
+          "title": "Status",
+          "scale": {"domain": ["F","PF","NF"], "range": ["#08306b", "#6baed6", "#deebf7"]}
+        },
+        "tooltip": [
+          {"field": "country", "title": "Country"},
+          {"field": "2000", "title": "2000", "type": "quantitative", "format": ".1f"},
+          {"field": "2023", "title": "2023", "type": "quantitative", "format": ".1f"},
+          {"field": "delta", "title": "Change", "type": "quantitative", "format": ".1f"},
+          {"field": "freedom_status", "title": "Status"}
+        ]
+      }
+    }
+  ]
+}

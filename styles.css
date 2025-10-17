@@ -1,0 +1,92 @@
+/* ===== Base layout & typography ===== */
+:root{
+  --card-pad:14px;
+  --card-gap:24px;
+  --text-width:60ch;   /* ~10 words per line */
+  --bg-green:#e9f7ef;  /* light green background */
+  --card-border:#dfeee5;
+}
+
+*{ box-sizing:border-box; }
+html, body{ height:100%; }
+
+body{
+  margin:0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  color:#222;
+  background:var(--bg-green);
+  overflow-x:hidden;               /* no horizontal scroll */
+}
+
+/* Page wrapper keeps everything centered and narrow */
+.wrap{
+  max-width:1100px;
+  margin:0 auto;
+  padding:28px 16px 64px;
+}
+
+/* Header */
+header{
+  text-align:center;
+  margin-bottom:22px;
+  background:#e3f4ea;
+  border:1px solid var(--card-border);
+  border-radius:12px;
+  padding:14px;
+}
+header h1{ font-size:40px; margin:0 0 6px; line-height:1.1; }
+header p{ margin:0; color:#555; font-size:18px; }
+
+/* One visualization per section (full width) */
+section{ margin: var(--card-gap) 0; }
+.viz{
+  background:#fff;
+  border:1px solid var(--card-border);
+  border-radius:12px;
+  padding: var(--card-pad);
+}
+
+/* Keep headings and paragraphs to ~10 words/line */
+h2,
+.viz p,
+#intro p,
+#conclusion p,
+footer p,
+footer ul{
+  max-width: var(--text-width);
+  line-height:1.45;
+  word-wrap: break-word;
+  overflow-wrap: anywhere;
+  margin-left:0;
+  margin-right:0;
+}
+
+/* subtitle generated from an attribute on .viz */
+.explain[data-subtitle]::before{
+  content: attr(data-subtitle);
+  display: block;
+  margin: 10px 0 8px;
+  color: #5b6b7b;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: .2px;
+}
+
+/* Chart holder so embeds never overflow */
+.holder,
+.holder > div,
+.vega-embed{
+  width:100%;
+  max-width:100%;
+  margin-top:8px;
+}
+
+/* Footer list */
+footer ul{ padding-left:18px; margin-top:4px; }
+
+/* Optional helper for muted notes */
+.chart-note{ color:#444; }
+
+/* Links */
+a{ color:#0b5; text-decoration:underline; }
+a:hover{ text-decoration:none; }

@@ -1,0 +1,67 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "title": "Access (2023) vs Freedom (2024) — Countries with Both",
+  "width": 850,
+  "height": 420,
+  "data": {"url": "internet_access_long.csv"},
+  "transform": [
+    {"calculate": "toNumber(datum.year)", "as": "yr"},
+    {"calculate": "toNumber(datum.users_pct)", "as": "access"},
+    {"filter": "datum.yr == 2023 && isValid(datum.access)"},
+    {
+      "lookup": "country",
+      "from": {
+        "data": {"url": "freedom_net.csv"},
+        "key": "country",
+        "fields": ["freedom_score","freedom_status","year"]
+      }
+    },
+    {"calculate": "toNumber(datum.freedom_score)", "as": "freedom"},
+    {"filter": "isValid(datum.freedom)"},
+    {"window": [{"op": "rank", "as": "rk"}], "sort": [{"field": "access", "order": "descending"}]},
+    {"filter": "datum.rk <= 20"},
+    {"fold": ["access","freedom"], "as": ["metric","value"]}
+  ],
+  "mark": {"type": "bar", "tooltip": true},
+  "encoding": {
+    "x": {
+      "field": "country",
+      "type": "nominal",
+      "sort": "-y",
+      "axis": {
+        "title": "Country",
+        "labelAngle": -40,
+        "labelLimit": 90,
+        "labelOverlap": false
+      }
+    },
+    "xOffset": {"field": "metric"},
+    "y": {
+      "field": "value",
+      "type": "quantitative",
+      "title": "Value",
+      "scale": {"domain": [0, 100]},
+      "axis": {"labelExpr": "datum.value + '%'"}
+    },
+    "color": {
+      "field": "metric",
+      "type": "nominal",
+      "scale": {"domain": ["access","freedom"], "range": ["#4aa3df","#2da96b"]},
+      "legend": {
+        "title": null,
+        "labelExpr": "datum.label == 'access' ? 'Access 2023' : 'Freedom 2024'"
+      }
+    },
+    "order": {"field": "metric", "sort": "ascending"},
+    "tooltip": [
+      {"field": "country"},
+      {"field": "access", "title": "% Online (2023)", "type": "quantitative", "format": ".1f"},
+      {"field": "freedom", "title": "Freedom (2024)", "type": "quantitative", "format": ".0f"},
+      {"field": "freedom_status", "title": "Status"}
+    ]
+  },
+  "config": {
+    "bar": {"cornerRadiusEnd": 2},
+    "axis": {"grid": true}
+  }
+}

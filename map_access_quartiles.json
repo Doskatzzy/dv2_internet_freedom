@@ -1,0 +1,58 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "width": 900,
+  "height": 520,
+  "params": [
+    {"name": "zoom", "value": 160, "bind": {"input": "range", "name": "Zoom: ", "min": 80, "max": 900, "step": 1}},
+    {"name": "lon", "value": 0, "bind": {"input": "range", "name": "Lon: ", "min": -180, "max": 180, "step": 1}},
+    {"name": "lat", "value": 0, "bind": {"input": "range", "name": "Lat: ", "min": -60, "max": 85, "step": 1}},
+    {"name": "yearPick", "value": 2023, "bind": {"input": "range", "name": "Year: ", "min": 1990, "max": 2023, "step": 1}}
+  ],
+  "projection": {"type": "equalEarth", "center": {"expr": "[lon, lat]"}, "scale": {"expr": "zoom"}},
+  "data": {"url": "internet_access_long.csv"},
+  "transform": [
+    {"calculate": "toNumber(datum.year)", "as": "yr"},
+    {"calculate": "toNumber(datum.users_pct)", "as": "val"},
+    {"filter": "isValid(datum.val) && datum.yr == yearPick"},
+    {
+      "lookup": "iso3",
+      "from": {
+        "data": {
+          "url": "ne_110m_admin_0_countries.json",
+          "format": {"type": "topojson", "feature": "ne_110m_admin_0_countries"}
+        },
+        "key": "properties.ADM0_A3"
+      },
+      "as": "geo"
+    }
+  ],
+  "layer": [
+    {
+      "data": {
+        "url": "ne_110m_admin_0_countries.json",
+        "format": {"type": "topojson", "feature": "ne_110m_admin_0_countries"}
+      },
+      "mark": {"type": "geoshape", "fill": "#f0f2f5", "stroke": "#d0d0d0", "strokeWidth": 0.5}
+    },
+    {
+      "mark": {"type": "geoshape", "stroke": "#d0d0d0", "strokeWidth": 0.5},
+      "encoding": {
+        "shape": {"field": "geo", "type": "geojson"},
+        "color": {
+          "field": "val",
+          "type": "quantitative",
+          "title": "% online (quartiles)",
+          "scale": {
+            "type": "quantile",
+            "range": ["#deebf7","#9ecae1","#4292c6","#084594"]
+          }
+        },
+        "tooltip": [
+          {"field": "country", "title": "Country"},
+          {"field": "val", "title": "% Online", "type": "quantitative", "format": ".1f"},
+          {"field": "yr", "title": "Year"}
+        ]
+      }
+    }
+  ]
+}

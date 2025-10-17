@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>The Digital Divide: Internet Access & Freedom</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+  <style>
+    /* Layout + typography */
+    :root{
+      --card-pad:14px;
+      --card-gap:24px;
+      --text-width:50ch; /* ~10 words/line on average */
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+      color:#222;
+      overflow-x:hidden; /* no horizontal scroll */
+      background:#fff;
+    }
+    .wrap{
+      max-width: 1100px;    /* narrow to avoid long lines */
+      margin: 0 auto;
+      padding: 28px 16px 64px;
+    }
+    header{ text-align:center; margin-bottom: 22px; }
+    header h1{ font-size: 40px; margin: 0 0 6px; line-height:1.1; }
+    header p{ margin: 0; color:#555; font-size: 18px; }
+
+    /* Each viz is a full-width block (one per line) */
+    section{ margin: var(--card-gap) 0; }
+    .viz{
+      background:#acc6ab;
+      border:1px solid #eee;
+      border-radius:12px;
+      padding: var(--card-pad);
+    }
+
+    /* Keep headings and paragraphs to ~10 words per line */
+    h2, .viz p, #intro p, #conclusion p, footer p, footer ul{
+      max-width: var(--text-width);
+      line-height:1.45;
+      word-wrap: break-word;
+      overflow-wrap: anywhere;
+      margin-left:0;
+      margin-right:0;
+    }
+
+    /* Space under charts */
+    .viz .holder{ margin-top: 8px; }
+
+    /* Footer list reset */
+    footer ul{ padding-left: 18px; margin-top:4px; }
+
+    /* Make sure embeds never overflow horizontally */
+    .holder, .holder > div{ width:100%; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>The Digital Divide: Internet Access & Freedom</h1>
+      <p>Exploring how connectivity and online freedom vary by country</p>
+    </header>
+
+    <section id="intro" class="viz" style="margin-top:12px;">
+      <h2>Why this dashboard?</h2>
+      <p>
+        This dashboard explores the relationship between two ideas that are often conflated but are not the same:
+        <strong>internet access</strong> (how many people are online) and <strong>internet freedom</strong> (how free those people are to
+        access, publish and organize online). Using multiple views global choropleths with zoom and year sliders, a map
+        of the first year each country passed the 50% adoption threshold, a 2024 freedom score map, a bubble
+        chart of access vs. freedom (with outlier annotations), a 1990-2023 line view for the most connected countries,
+        an overview + detail time series, a dumbbell chart comparing 2023 access vs. 2024 freedom, a simple status
+        breakdown, and side-by-side bars for countries with both metrics-we surface patterns that are easy to miss in
+        tables. Together, these views show that connectivity has expanded rapidly, but freedoms vary widely:
+        Nordic countries cluster high on both metrics, while several high access Gulf and post Soviet
+        states display large access and freedom gaps. Use the sliders, dropdowns, legends and tooltips to drill down into
+        specific countries and years.
+      </p>
+    </section>
+
+
+    <section>
+      <div class="viz">
+        <h2>Global Internet Access (1990-Latest) - Quartiles</h2>
+        <div id="map_access_quartiles"></div>
+        <div class="explain" data-subtitle="Internet Access Overtime"></div>
+        <p style="margin-top:10px;color:#444;">
+          This choropleth maps the share of people online for any chosen year, grouped into quartiles:
+          darker blue means higher access, lighter blue lower access for that year's distribution.
+          Use the <strong>Year</strong> slider to watch adoption spread from early leaders in North
+          America, Western Europe, Oceania and East Asia in the 1990s to broader uptake across Latin
+          America, Eastern Europe and North Africa in the 2000s-2010s. The <strong>Zoom</strong>,
+          <strong>Lon</strong> and <strong>Lat</strong> sliders let you focus on regions or small
+          countries. You can hover over a country for exact values. The view highlights strong global progress,
+          but also persistent pockets of low access in parts of Sub-Saharan Africa, illustrating an
+          uneven digital divide.
+        </p>
+      </div>
+    </section>
+
+    <section>
+      <div class="viz">
+        <h2>Year Each Country First Reached >=50% Online</h2>
+        <div id="map_reach50"></div>
+        <div class="explain" data-subtitle="Who is reaching >=50% access first?"></div>
+        <p style="margin-top:10px;color:#444;">
+          This map shows the first year each country's internet adoption crossed the
+          50% of population threshold. The blue colour scale encodes the year (darker = more recent) whereas
+          countries in orange have not yet reached 50%. Hover for exact dates. You can quickly spot early adopters (Nordics, North
+          America, Western Europe, Oceania) versus later surges across Latin America and parts of
+          Asia in the 2010s. Clustered orange in parts of Sub-Saharan Africa and a few Asian states
+          highlights where connectivity remains below a majority today. You may notice outliers such in their continents
+          such as North Korea and Papua New Guinea. For reasons unkonwn (perhaps it only becoming a country in 2011),
+          South Sudan has no data.
+        </p>
+      </div>
+    </section>
+
+    <section class="two-col">
+      <div class="viz">
+        <h2>Freedom Status Breakdown</h2>
+        <div id="bar_status"></div>
+        <div class="explain" data-subtitle="Which Countries are Free with their internet access?"></div>
+        <p class="chart-note">
+          This simple bar chart summarizes the <strong>2024 Internet Freedom Status</strong> across countries:
+          Free (F), Partly Free (PF) and Not Free (NF). Bars show the <strong>number of countries</strong>
+          in each category, using a consistent blue palette where darker shades indicate stronger freedom. Hover any bar to see the
+          exact count. Use this as a quick snapshot of the global landscape before diving into country-level detail in the other views.
+        </p>
+      </div>
+    </section>
+
+    <section class="two-col">
+      <div class="viz">
+        <h2>Internet Freedom Score (2024)</h2>
+        <div id="map_freedom_score"></div>
+        <div class="explain" data-subtitle="Map of Freedom Around the World"></div>
+        <p style="margin-top:10px;color:#444;">
+          This choropleth maps each country's 2024 Freedom on the Net score (0-100),
+          shaded from light (more restrictions) to dark blue (greater online freedom). Use the
+          <strong>Zoom</strong> slider to inspect regions in detail and the <strong>Lon</strong>/<strong>Lat</strong>
+          sliders to pan the map's center. You'll notice consistently high scores across much of
+          Western Europe, North America and Oceania, while parts of the Middle East, Africa and
+          Central Asia show lighter tones, indicating tighter controls on access, content and user
+          rights. Hover any country to compare scores and spot regional contrasts at a glance.
+        </p>
+      </div>
+    </section>
+
+    <section>
+      <div class="viz">
+        <h2>Access vs Freedom (Latest)</h2>
+        <div id="scatter"></div>
+        <div class="explain" data-subtitle="What does the Scatter show us?"></div>
+        <p style="margin-top:10px;color:#444;">
+          This bubble chart compares each country's <strong>% of population online</strong> (x-axis) with its
+          <strong>Freedom on the Net score</strong> (y-axis, 0-100). Bubbles are shaded on a single blue scale
+          (darker means higher freedom) and sized by the share of people online, so larger, darker bubbles indicate
+          both high access and strong digital rights. The dotted guides at 60% online and
+          70/100 freedom divide the space into informative quadrants. For example, the upper-right shows
+          places with both high connectivity and freedom. Hover to see exact values; notable points such as
+          Iceland (94% online, 94/100 freedom) are annotated to illustrate the upper bound. Use the
+          legend to interpret status colours and the bubble size key to relate area to access.
+        </p>
+      </div>
+    </section>
+
+    <section class="two-col">
+      <div class="viz">
+        <h2>Connectivity Progress: 2000 → 2023</h2>
+        <div id="dumbbell_2000_2023"></div>
+        <div class="explain" data-subtitle="The 'Dumbbell' of Progress"></div>
+        <p class="chart-note">
+          This slope-dumbbell chart compares each country's internet access in <strong>2000</strong> (left diamond) 
+          to <strong>2023</strong> (right circle). Read each row left to right: the longer the arrow, the bigger the 
+          gain in % of the population online. Most countries show large jumps with many moving from single digits in 
+          2000 to 80-95%+ by 2023, while a few still lag behind. Point colour encodes the latest Freedom on the Net status (F/PF/NF), 
+          highlighting that rapid connectivity growth does not always coincide with high online freedom. Hover any row to see exact values
+          and scan arrow lengths to spot the biggest improvers, and compare rows with the same colour to contrast progress among similarly rated countries.
+        </p>
+      </div>
+    </section>
+
+    <section>
+      <div class="viz">
+        <h2>Country Snapshot: Access vs Freedom (Dumbbell)</h2>
+        <div id="dumbbell_access_vs_freedom"></div>
+        <div class="explain" data-subtitle="The Gap between Freedom and Access"></div>
+        <p class="chart-note">
+          This dumbbell plot compares each country's <strong>internet access in 2023</strong> (left round marker) with its
+          <strong>Freedom on the Net score in 2024</strong> (right square). Countries are the top 30 by access and are listed down the
+          y-axis while the x-axis is a 0-100 scale. The connecting line shows the 'gap' between being online and being free online where shorter
+          lines indicate that access and freedom are similar, while long lines reveal places where connectivity far outpaces civil
+          liberties. Square colour encodes the latest freedom status (F/PF/NF). Use the <strong>“Filter by status”</strong> dropdown to
+          focus on one status and hover points to see exact values. Note, for example, the annotation for Belarus:
+          despite very high access (91.5%), its freedom score is very low (22), illustrating how availability does not guarantee openness.
+        </p>
+      </div>
+    </section>
+
+    <section class="two-col">
+      <div class="viz">
+        <h2>Top 10 Most Connected Countries (1990-2023)</h2>
+        <div id="top10_1990_2023_lines"></div>
+        <div class="explain" data-subtitle="Our Top 10 access countries, but over time:"></div>
+        <p class="chart-note">
+          This line chart tracks the <strong>top 10 most connected countries</strong> from <strong>1990-2023</strong>, showing the
+          share of each country's population online (y-axis) over time (x-axis). Use the legend on the right to identify each line and
+          hover anywhere to see exact year-value pairs. Two broad patterns emerge: (1) early adopters such as Iceland,
+          Norway and Luxembourg climb steadily from the late 1990s and approach saturation (95-100%) by the mid-2010s.
+          (2) several Gulf states-including Qatar, United Arab Emirates, Saudi Arabia, Kuwait and
+          Bahrain, show rapid growth in the 2000s, catching up to the early leaders by the 2010s. Despite different
+          starting points and growth rates, by the early 2020s all ten countries converge near universal access, highlighting how quickly
+          late adopters closed the gap once infrastructure and mobile broadband scaled.
+        </p>
+      </div>
+    </section>
+
+    <section>
+      <div class="viz">
+        <h2>Internet Access - Overview + Detail</h2>
+        <div id="brush_access_overview"></div>
+        <div class="explain" data-subtitle="The select countries, and their access over time"></div>
+        <p class="chart-note">
+          This <strong>overview + detail</strong> view shows a single country's internet adoption from <strong>1990-2023</strong>.
+          The top line tracks the share of the population online each year while the bottom area chart provides context and lets you
+          focus on a time window. Use the Country dropdown to switch nations, then drag across the bottom chart
+          to brush a period. The top chart zooms to that selection so you can inspect inflection points (e.g. broadband and
+          smartphone take-off years). Hover any point for exact values. This layout makes it easy to compare a country's early
+          slow growth to later acceleration and see when it approached saturation.
+        </p>
+      </div>
+    </section>
+
+    <section>
+      <div class="viz">
+        <h2>Access vs Freedom - Side-by-Side Bars</h2>
+        <div id="bar_access_vs_freedom_grouped"></div>
+        <div class="explain" data-subtitle="What is the side-by-side telling us overtime"></div>
+        <p class="chart-note">
+          This side-by-side bar chart compares <strong>Internet access in 2023</strong> (blue) with the <strong>Internet freedom score in 2024</strong> (green) 
+          for countries where both metrics are available. Read each pair left to right: tall blue with similarly tall green bars (e.g. Iceland, Estonia, Canada) 
+          indicate places that are both highly connected and relatively free online. In contrast, countries such as the United Arab Emirates, Bahrain, Kazakhstan, 
+          Saudi Arabia and Belarus show very high access but much lower freedom scores-evidence of a strong connectivity-freedom gap. Hover a bar to see exact 
+          values and use the x-axis labels to scan regional patterns.
+        </p>
+      </div>
+    </section>
+
+    <section id="conclusion" class="viz">
+      <h2>What did we learn?</h2>
+      <p>
+        Three takeaways stand out. First, the world crossed a series of adoption tipping points after 2000 where most countries
+        reached >=50% online only in the past decade, which the “Year reached >=50%” map makes clear. Second, more access
+        does <em>not</em> guarantee more freedom: the dumbbell and side-by-side bar charts highlight countries with near-universal
+        connectivity but low freedom scores (e.g. Bahrain, Kazakhstan, Belarus). Third, a subset of countries
+        sustain both high access and high freedom-Nordics, parts of Western Europe, and a few Asia-Pacific economies-showing
+        the combination is possible but policy-dependent. These visuals are a snapshot (freedom is shown for 2024), so trends
+        may shift; nonetheless, the overall picture is of a two-speed digital world where infrastructure has outpaced rights in
+        many places. Use this dashboard to spot peers, identify outliers, and frame questions for deeper research or policy design.
+      </p>
+      <p style="font-size:0.92em;color:#666;margin-top:8px;">
+        <strong>Notes & limitations:</strong> Freedom scores come from a single recent year, while access is a long series. The differences
+        in methodology across sources and missing data for some territories may affect comparisons. Choropleths emphasize geography
+        over population size. Please consult tooltips for precise values.
+      </p>
+    </section>
+
+    <footer class="viz" style="margin-top:24px;">
+      <p style="margin:4px 0;"><strong>Created:</strong> 12/10/2025 by <strong>Aden Katz</strong></p>
+      <p style="margin:4px 0;"><strong>Sources:</strong></p>
+      <ul style="margin:4px 0 0 18px;">
+        <li>
+          Freedom House - 
+          <a href="https://freedomhouse.org/explore-the-map?type=all&year=2025" target="_blank" rel="noopener">
+            https://freedomhouse.org/explore-the-map?type=all&year=2025
+          </a>
+        </li>
+        <li>
+          World Bank Group - 
+          <a href="https://data.worldbank.org/indicator/IT.NET.USER.ZS?most_recent_year_desc=true" target="_blank" rel="noopener">
+            https://data.worldbank.org/indicator/IT.NET.USER.ZS?most_recent_year_desc=true
+          </a>
+        </li>
+      </ul>
+    </footer>
+
+  </div>
+
+  <script>
+    const opts = { actions: false, renderer: "canvas" };
+
+    vegaEmbed("#map_access_quartiles", "map_access_quartiles.json", opts);
+    vegaEmbed("#map_reach50", "map_reach50.json", opts);
+    vegaEmbed("#bar_status", "bar_status.json", opts);
+    vegaEmbed("#map_freedom_score", "map_freedom_score.json", opts);
+    vegaEmbed("#scatter", "scatter.json", opts);
+    vegaEmbed("#dumbbell_2000_2023", "dumbbell_2000_2023.json", opts);
+    vegaEmbed("#dumbbell_access_vs_freedom", "dumbbell_access_vs_freedom.json", opts);
+    vegaEmbed("#top10_1990_2023_lines", "top10_1990_2023_lines.json", opts);
+    vegaEmbed("#brush_access_overview", "brush_access_overview.json", opts);
+    vegaEmbed("#bar_access_vs_freedom_grouped", "bar_access_vs_freedom_grouped.json", opts);
+  </script>
+</body>
+</html>

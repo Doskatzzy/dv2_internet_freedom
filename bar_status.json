@@ -1,0 +1,14 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "width": 500,
+  "height": 260,
+  "data": {"url": "freedom_net.csv"},
+  "transform": [{"aggregate": [{"op": "count", "as": "n"}], "groupby": ["freedom_status"]}],
+  "mark": "bar",
+  "encoding": {
+    "x": {"field": "freedom_status", "type": "nominal", "title": "Freedom Status", "sort": ["F","PF","NF"]},
+    "y": {"field": "n", "type": "quantitative", "title": "Countries"},
+    "color": {"field": "freedom_status", "type": "nominal", "scale": {"domain": ["F","PF","NF"], "range": ["#08306b", "#6baed6", "#deebf7"]}},
+    "tooltip": [{"field": "freedom_status", "title": "Status"}, {"field": "n", "title": "Countries"}]
+  }
+}
