@@ -1,6 +1,6 @@
 {
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-  "title": "Access (2023) vs Freedom (2024) - Dumbbell (Top 30 by Access)",
+  "title": "Access (2023, circle) vs Freedom (2024, square) - Dumbbell (Top 30 by Access)",
   "width": 800,
   "height": {"step": 18},
   "data": {"url": "internet_access_long.csv"},

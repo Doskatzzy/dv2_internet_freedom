@@ -39,7 +39,7 @@
       "encoding": {
         "y": {"field": "country", "type": "nominal", "sort": {"field": "delta", "order": "descending"}},
         "x": {"field": "value", "type": "quantitative", "title": "(2000 vs 2023)"},
-        "shape": {"field": "year", "type": "nominal", "scale": {"domain": ["2000","2023"], "range": ["triangle-left","circle"]}},
+        "shape": {"field": "year", "type": "nominal", "scale": {"domain": ["2000","2023"], "range": ["circle", "triangle-right"]}},
         "color": {
           "field": "freedom_status",
           "type": "nominal",

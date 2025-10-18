@@ -49,7 +49,6 @@
         ]
       }
     },
-
     {
       "data": {"url": "internet_access_long.csv"},
       "transform": [

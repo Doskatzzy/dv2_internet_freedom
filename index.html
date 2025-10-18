@@ -8,59 +8,7 @@
   <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
   <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
   <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
-  <style>
-    /* Layout + typography */
-    :root{
-      --card-pad:14px;
-      --card-gap:24px;
-      --text-width:50ch; /* ~10 words/line on average */
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;
-      font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
-      color:#222;
-      overflow-x:hidden; /* no horizontal scroll */
-      background:#fff;
-    }
-    .wrap{
-      max-width: 1100px;    /* narrow to avoid long lines */
-      margin: 0 auto;
-      padding: 28px 16px 64px;
-    }
-    header{ text-align:center; margin-bottom: 22px; }
-    header h1{ font-size: 40px; margin: 0 0 6px; line-height:1.1; }
-    header p{ margin: 0; color:#555; font-size: 18px; }
-
-    /* Each viz is a full-width block (one per line) */
-    section{ margin: var(--card-gap) 0; }
-    .viz{
-      background:#acc6ab;
-      border:1px solid #eee;
-      border-radius:12px;
-      padding: var(--card-pad);
-    }
-
-    /* Keep headings and paragraphs to ~10 words per line */
-    h2, .viz p, #intro p, #conclusion p, footer p, footer ul{
-      max-width: var(--text-width);
-      line-height:1.45;
-      word-wrap: break-word;
-      overflow-wrap: anywhere;
-      margin-left:0;
-      margin-right:0;
-    }
-
-    /* Space under charts */
-    .viz .holder{ margin-top: 8px; }
-
-    /* Footer list reset */
-    footer ul{ padding-left: 18px; margin-top:4px; }
-
-    /* Make sure embeds never overflow horizontally */
-    .holder, .holder > div{ width:100%; }
-  </style>
+ 
 </head>
 <body>
   <div class="wrap">
@@ -69,12 +17,12 @@
       <p>Exploring how connectivity and online freedom vary by country</p>
     </header>
 
-    <section id="intro" class="viz" style="margin-top:12px;">
+    <section id="intro" class="viz">
       <h2>Why this dashboard?</h2>
-      <p>
+      <p class="viz-note">
         This dashboard explores the relationship between two ideas that are often conflated but are not the same:
         <strong>internet access</strong> (how many people are online) and <strong>internet freedom</strong> (how free those people are to
-        access, publish and organize online). Using multiple views global choropleths with zoom and year sliders, a map
+        access, publish and organise online). Using multiple views global choropleths with zoom and year sliders, a map
         of the first year each country passed the 50% adoption threshold, a 2024 freedom score map, a bubble
         chart of access vs. freedom (with outlier annotations), a 1990-2023 line view for the most connected countries,
         an overview + detail time series, a dumbbell chart comparing 2023 access vs. 2024 freedom, a simple status
@@ -130,7 +78,7 @@
         <div id="bar_status"></div>
         <div class="explain" data-subtitle="Which Countries are Free with their internet access?"></div>
         <p class="chart-note">
-          This simple bar chart summarizes the <strong>2024 Internet Freedom Status</strong> across countries:
+          This simple bar chart summarises the <strong>2024 Internet Freedom Status</strong> across countries:
           Free (F), Partly Free (PF) and Not Free (NF). Bars show the <strong>number of countries</strong>
           in each category, using a consistent blue palette where darker shades indicate stronger freedom. Hover any bar to see the
           exact count. Use this as a quick snapshot of the global landscape before diving into country-level detail in the other views.
@@ -166,8 +114,8 @@
           (darker means higher freedom) and sized by the share of people online, so larger, darker bubbles indicate
           both high access and strong digital rights. The dotted guides at 60% online and
           70/100 freedom divide the space into informative quadrants. For example, the upper-right shows
-          places with both high connectivity and freedom. Hover to see exact values; notable points such as
-          Iceland (94% online, 94/100 freedom) are annotated to illustrate the upper bound. Use the
+          places with both high connectivity and freedom. Hover to see exact values. Notable points such as
+          Iceland (99.8% online, 94/100 freedom) are annotated to illustrate the upper bound. Use the
           legend to interpret status colours and the bubble size key to relate area to access.
         </p>
       </div>
@@ -179,8 +127,8 @@
         <div id="dumbbell_2000_2023"></div>
         <div class="explain" data-subtitle="The 'Dumbbell' of Progress"></div>
         <p class="chart-note">
-          This slope-dumbbell chart compares each country's internet access in <strong>2000</strong> (left diamond) 
-          to <strong>2023</strong> (right circle). Read each row left to right: the longer the arrow, the bigger the 
+          This slope-dumbbell chart compares each country's internet access in <strong>2000</strong> (left circle) 
+          to <strong>2023</strong> (right triangle). Read each row left to right: the longer the arrow, the bigger the 
           gain in % of the population online. Most countries show large jumps with many moving from single digits in 
           2000 to 80-95%+ by 2023, while a few still lag behind. Point colour encodes the latest Freedom on the Net status (F/PF/NF), 
           highlighting that rapid connectivity growth does not always coincide with high online freedom. Hover any row to see exact values
@@ -195,7 +143,7 @@
         <div id="dumbbell_access_vs_freedom"></div>
         <div class="explain" data-subtitle="The Gap between Freedom and Access"></div>
         <p class="chart-note">
-          This dumbbell plot compares each country's <strong>internet access in 2023</strong> (left round marker) with its
+          This dumbbell plot compares each country's <strong>internet access in 2023</strong> (left circld) with its
           <strong>Freedom on the Net score in 2024</strong> (right square). Countries are the top 30 by access and are listed down the
           y-axis while the x-axis is a 0-100 scale. The connecting line shows the 'gap' between being online and being free online where shorter
           lines indicate that access and freedom are similar, while long lines reveal places where connectivity far outpaces civil
@@ -264,12 +212,12 @@
         connectivity but low freedom scores (e.g. Bahrain, Kazakhstan, Belarus). Third, a subset of countries
         sustain both high access and high freedom-Nordics, parts of Western Europe, and a few Asia-Pacific economies-showing
         the combination is possible but policy-dependent. These visuals are a snapshot (freedom is shown for 2024), so trends
-        may shift; nonetheless, the overall picture is of a two-speed digital world where infrastructure has outpaced rights in
+        may shift. Nonetheless, the overall picture is of a two-speed digital world where infrastructure has outpaced rights in
         many places. Use this dashboard to spot peers, identify outliers, and frame questions for deeper research or policy design.
       </p>
       <p style="font-size:0.92em;color:#666;margin-top:8px;">
         <strong>Notes & limitations:</strong> Freedom scores come from a single recent year, while access is a long series. The differences
-        in methodology across sources and missing data for some territories may affect comparisons. Choropleths emphasize geography
+        in methodology across sources and missing data for some territories may affect comparisons. Choropleths emphasise geography
         over population size. Please consult tooltips for precise values.
       </p>
     </section>

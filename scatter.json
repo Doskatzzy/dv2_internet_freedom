@@ -73,7 +73,7 @@
     {
       "transform":[
         {"filter":"datum.country == 'Iceland'"},
-        {"calculate":"'Iceland - 94% online and 94/100 freedom (2024) score. This is largely thanks to the fact that censorship is prohibited by the Icelandic Constitution'","as":"label"}
+        {"calculate":"'Iceland - 99.8% online and 94/100 freedom (2024) score. This is largely thanks to the fact that censorship is prohibited by the Icelandic Constitution'","as":"label"}
       ],
       "mark":{
         "type":"text","align":"right","dx": -15,"dy": 5
